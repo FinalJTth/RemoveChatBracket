@@ -3,7 +3,10 @@
   "package": "com.zenesta.removechatbracket.mixin",
   "compatibilityLevel": "JAVA_17",
   "refmap": "removechatbracket.refmap.json",
-  "mixins": [],
+  "mixins": [
+    "MixinChatType",
+    "MixinServerGamePacketListenerImpl"
+  ],
   "client": [
     "MixinChatListener"
   ],

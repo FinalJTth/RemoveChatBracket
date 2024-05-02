@@ -5,6 +5,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.chat.ChatListener;
 import net.minecraft.network.chat.*;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.levelgen.WorldDimensions;
+import net.minecraft.world.level.storage.WorldData;
 import org.spongepowered.asm.mixin.*;
 
 import javax.annotation.Nullable;
@@ -49,6 +52,8 @@ public class MixinChatListener {
 
             return flag1;
         });
+
+        Minecraft.getInstance().player.displayClientMessage(Component.literal(pBoundChatType.chatType().chat().translationKey()), true);
     }
 
     @Unique
