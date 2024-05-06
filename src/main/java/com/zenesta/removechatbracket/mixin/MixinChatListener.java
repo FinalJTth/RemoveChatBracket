@@ -1,6 +1,7 @@
 package com.zenesta.removechatbracket.mixin;
 
 import com.mojang.authlib.GameProfile;
+import com.zenesta.removechatbracket.common.chat.ChatFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.chat.ChatListener;
@@ -10,8 +11,6 @@ import org.spongepowered.asm.mixin.*;
 import javax.annotation.Nullable;
 import java.time.Instant;
 import java.util.function.BooleanSupplier;
-
-import static com.zenesta.removechatbracket.common.RemoveChatBracket.LOGGER;
 
 @Mixin(ChatListener.class)
 public class MixinChatListener {
@@ -37,7 +36,7 @@ public class MixinChatListener {
         boolean flag = this.minecraft.options.onlyShowSecureChat().get();
         PlayerChatMessage playerchatmessage = flag ? pChatMessage.removeUnsignedContent() : pChatMessage;
 
-        Component displayComponent = removeChatBracket$removeChatBracket(playerchatmessage.decoratedContent(), pBoundChatType);
+        Component displayComponent = ChatFormatter.format(playerchatmessage.decoratedContent(), pBoundChatType);
 
         Instant instant = Instant.now();
         this.handleMessage(pChatMessage.signature(), () -> {
@@ -51,31 +50,10 @@ public class MixinChatListener {
         });
     }
 
-    @Unique
-    private Component removeChatBracket$removeChatBracket(Component pContent, ChatType.Bound pBoundChatType) {
-        Component displayComponent;
-
-        ChatTypeDecoration decoration = pBoundChatType.chatType().chat();
-        // Extract Component from ChatTypeDecoration.
-        Object[] aobject = this.removeChatBracket$resolveParameters(pContent, pBoundChatType);
-
-        if (pBoundChatType.chatType().chat().translationKey().equals("chat.type.text"))
-            displayComponent = Component.translatable("custom.chat.type.text", aobject).withStyle(decoration.style());
-        else
-            displayComponent = pBoundChatType.decorate(pContent);
-
-        return displayComponent;
+    /*
+    @ModifyVariable(method = "handlePlayerChatMessage(Lnet/minecraft/network/chat/PlayerChatMessage;Lcom/mojang/authlib/GameProfile;L/net/minecraft/network/chat/ChatType$Bound;)V", at = @At("STORE"), ordinal = 0)
+    private Component inject(Component component) {
+        return ChatFormatter.format(playerchatmessage.decoratedContent(), pBoundChatType);
     }
-
-    @Unique
-    private Component[] removeChatBracket$resolveParameters(Component pContent, ChatType.Bound pBoundChatType) {
-        Component[] acomponent = new Component[pBoundChatType.chatType().chat().parameters().size()];
-
-        for(int i = 0; i < acomponent.length; ++i) {
-            ChatTypeDecoration.Parameter chattypedecoration$parameter = pBoundChatType.chatType().chat().parameters().get(i);
-            acomponent[i] = chattypedecoration$parameter.select(pContent, pBoundChatType);
-        }
-
-        return acomponent;
-    }
+    */
 }
